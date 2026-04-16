@@ -19,7 +19,8 @@
     "release": "rw-scripts ensure-deploy-env && pnpm run clean && pnpm run build && wrangler deploy",
     "generate": "rw-scripts ensure-env && wrangler types --include-runtime false",
     "check": "pnpm run generate && pnpm run types",
-    "types": "tsc"
+    "types": "tsc",
+    "agent-ci": "agent-ci"
   },
   "dependencies": {
     "react": "19.2.5",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.31.0",
     "@cloudflare/workers-types": "4.20260405.1",
+    "@redwoodjs/agent-ci": "^0.10.7",
     "@types/node": "~25.3.5",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
