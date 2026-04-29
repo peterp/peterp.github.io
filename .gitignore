@@ -1,0 +1,8 @@
+.devcontainer/
+.wrangler/
+node_modules/
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+provision.ts
+vm.ts
