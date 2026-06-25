@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Good Prompting — Peter Pistorius</title>
+  <style>
+    body {
+      max-width: 480px;
+      line-height: 1.6;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <p><a href="/blog/">Blog</a></p>
+
+  <article>
+    <h1>Good Prompting</h1>
+
+    <p><time datetime="2026-06-25">June 25, 2026</time></p>
+
+    <p>I don't know that much about good writing, but <a href="https://www.paulgraham.com/goodwriting.html">Paul Graham wrote something recently</a> that has been stuck in my head. He says writing that sounds right helps you find ideas that are right. When he rereads a draft, he is asking if anything catches, or if anything feels wrong.</p>
+
+    <p>I think this is also true when working with agents.</p>
+
+    <p>Maybe good prompting is not getting the first prompt right; it is drilling down until the prompt is right. The first prompt starts the work, the questions shape it, and the review is where you find out what the prompt should have said.</p>
+
+    <p>You cannot know what you don't know before building the thing. Creation is discovery, so the important work is often after the agent produces something. You review the artifact and ask questions until it makes sense.</p>
+
+    <p>I'm saying artifact on purpose. Agents don't only produce code. They produce PRs, tests, plans, comments, migrations, config, and docs. The output is a thing with concepts inside it.</p>
+
+    <p>I don't think you need to understand every line. That's not the goal. The goal is to understand every concept the artifact asks you to trust.</p>
+
+    <p>In practice, good prompting looks a lot like working with teammates, colleagues, or fellow builders. You don't throw something over the wall and accept whatever comes back. You ask questions. You review the plan. You ask why something exists. You ask whether something already does this. You leave comments where the next person would get confused.</p>
+
+    <p>Sometimes the best prompt is: don't code yet. Read the artifact, tell me what already exists, ask the questions that would change your approach, and give me a small plan I can review.</p>
+
+    <p>Not a giant spec. Not an RFP nobody can keep in their head. Just enough of a plan that we can see the concepts before they turn into code.</p>
+
+    <p>A common problem with coding agents is that they code too soon. Sometimes asking questions to clarify is the best work.</p>
+
+    <p>Creating with agents is not one prompt. It is the collective prompts and iterations that happen while you are building. The review comments are prompts. The clarifying questions are prompts. The comments you leave for the next reader are prompts too.</p>
+
+    <p>The questions are boring:</p>
+
+    <ul>
+      <li>Why is this here?</li>
+      <li>What already does this?</li>
+      <li>How does this work?</li>
+    </ul>
+
+    <p>Anything you can't answer clearly is the part that still doesn't make sense.</p>
+
+    <p>The second one matters a lot.</p>
+
+    <p>If React already has the concept, don't invent a new one. If the browser already has the concept, don't invent a new one. If the codebase already has the concept, don't invent a new one with a slightly different name.</p>
+
+    <p>Agents are good at making new things. Too good. They will happily add another helper, another wrapper, another config flag, another abstraction. Sometimes that's right. But a lot of the time the better answer is: no, this already exists.</p>
+
+    <p>This is where I think anxiety comes from. Not from complexity by itself, because some systems are just complex. The anxiety comes from depending on concepts you haven't made clear yet.</p>
+
+    <p>A large codebase can feel calm if the concepts make sense. A small change can feel dangerous if you don't know why it exists.</p>
+
+    <p>When something catches in review, I try to leave the artifact better than I found it. Ideally the thing explains itself with a better name, a smaller function, a less clever shape, or by deleting the extra concept entirely.</p>
+
+    <p>But sometimes you can't phrase it differently. Sometimes the concept is real and the code is already the simplest version of it. Then leave a comment.</p>
+
+    <p>Not a comment that says what the next line does. A comment that explains the thing you had to work to understand.</p>
+
+    <p>That comment is an artifact too. It's a little transfer of understanding from your brain into the system.</p>
+
+    <p>Every unanswered why leaves residue. Some of it lives in the artifact. Some of it lives in your brain.</p>
+
+    <p>So maybe good prompting is the review loop: ask why, ask what already does this, ask how, and then make the answer visible.</p>
+
+    <p>Not every line needs to be memorized. But every concept needs to be owned.</p>
+
+    <p>Good writing leaves fewer things catching in the reader's mind.</p>
+
+    <p>Good agent work should do the same.</p>
+  </article>
+</body>
+</html>
