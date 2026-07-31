@@ -24,7 +24,7 @@
 
     <p>There are a bunch of new terminal multiplexers coming out.</p>
 
-    <p>We already have <a href="https://github.com/tmux/tmux">tmux</a>, <a href="https://www.gnu.org/software/screen/">screen</a>, and <a href="https://zellij.dev">Zellij</a>. Now we have <a href="https://herdr.dev">Herdr</a>, <a href="https://cmux.com">cmux</a> with its own take on the idea, <a href="https://zmx.sh">zmx</a>, and <a href="https://mitchellh.com/writing/superlogical">Mitchell Hashimoto’s announcement of Superlogical</a>.</p>
+    <p>We already have <a href="https://github.com/tmux/tmux">tmux</a>, <a href="https://www.gnu.org/software/screen/">screen</a>, <a href="https://zellij.dev">Zellij</a>, and <a href="https://wezterm.org/multiplexing.html">WezTerm’s built-in multiplexer</a>. Now we have <a href="https://herdr.dev">Herdr</a>, <a href="https://cmux.com">cmux</a> with its own take on the idea, <a href="https://zmx.sh">zmx</a>, and <a href="https://mitchellh.com/writing/superlogical">Mitchell Hashimoto’s announcement of Superlogical</a>.</p>
 
     <p>I also want a new multiplexer for <a href="https://machinen.dev">Machinen Desktop</a>, and I want to explain why.</p>
 
@@ -179,6 +179,10 @@
     <p><a href="https://cmux.com">cmux</a> is a native terminal workspace with tabs, splits, notifications, and a browser. It describes itself as “a primitive, not a solution” and exposes a CLI and socket API.</p>
 
     <p><a href="https://herdr.dev">Herdr</a> includes workspaces, tabs, panes, agent awareness, plugins, and a socket API. Its server owns both the terminal processes and their layout. It also allows direct attachment to individual terminals, but only one direct client can own input and resize while other clients observe.</p>
+
+    <p><a href="https://wezterm.org/multiplexing.html">WezTerm</a> also includes a multiplexer. It supports persistent local and remote sessions through Unix sockets, SSH, and TLS. A WezTerm multiplexing domain is a set of windows and tabs, and remote multiplexing requires a compatible WezTerm installation on the server.</p>
+
+    <p>WezTerm is configurable and scriptable, but another client has to adopt WezTerm’s protocol and its window, tab, and pane model. That is too much. The session needs to be composable without the view coming with it.</p>
 
     <p><a href="https://www.superlogical.com">Superlogical</a> is starting with a terminal multiplexer. Its stated next step is to make everything in it composable. The architecture Mitchell has described uses one PTY per stream and puts native splits in the client instead of drawing several panes into one server-owned terminal screen.</p>
 
