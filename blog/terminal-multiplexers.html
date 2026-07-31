@@ -102,6 +102,26 @@
 
     <p>Those clients should be able to use the same sessions without having to reproduce the same layout.</p>
 
+    <pre>Server:
+
++-------+ +-------+ +-------+
+| PTY A | | PTY B | | PTY C |
++-------+ +-------+ +-------+
+    |        |         |
+    +--------+---------+
+             |
+       each client
+       chooses a view
+
+
+Desktop:             Phone:
+
++-----+-----+         +-----+
+|  A  |  B  |         |  B  |
++-----+-----+         +-----+
+|     C     |
++-----------+</pre>
+
     <p>This is the problem I have with tmux. The tmux server owns windows, panes, focus, and layout. Every attached client has to understand and reproduce that view.</p>
 
     <p>Herdr has the same issue. Its server owns workspaces, tabs, panes, and layout. It persists that layout and restores it when the server restarts. Herdr provides direct access to individual terminals and exposes a socket API, but its main model still makes the workspace layout part of shared server state.</p>
@@ -184,6 +204,13 @@ What one PTY provides:
     <p>A PTY also has one input stream, but that does not mean one person has to own it.</p>
 
     <p>Several clients can send input. The server can order that input before writing it to the PTY. It can record which person or agent sent it even though the terminal application itself receives one stream of bytes.</p>
+
+    <pre>person ------+
+             |
+agent -------+--> ordered input --> PTY
+             |                       |
+person ------+                       v
+                              output to everyone</pre>
 
     <p>Everyone is interacting with the same cursor and the same application state. If two people type at exactly the same time, their input has to be ordered. Independent cursors would require support from the terminal application.</p>
 
