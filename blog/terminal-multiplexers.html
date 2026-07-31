@@ -11,6 +11,10 @@
       line-height: 1.6;
       padding: 20px;
     }
+
+    pre {
+      overflow-x: auto;
+    }
   </style>
 </head>
 
@@ -119,6 +123,37 @@
     <p>My preference would be for every client to view the same session at its own terminal size. A desktop could have a large terminal while a phone renders a smaller version of the same session.</p>
 
     <p>A PTY cannot support that.</p>
+
+    <pre>What I want:
+
++------------------+       +----------------+
+| desktop          |       | phone          |
+| wants 120 x 40   |       | wants 50 x 20  |
++--------+---------+       +-------+--------+
+         \                         /
+          \      same session     /
+           +---------------------+
+             redraw for each view
+                 (not possible)
+
+
+What one PTY provides:
+
+             +------------------+
+             | running program  |
+             | sees 120 x 40    |
+             +--------+---------+
+                      |
+              one output stream
+                      |
+             +--------v---------+
+             | PTY: 120 x 40    |
+             +----+---------+---+
+                  |         |
+        +---------v-+   +---v------------+
+        | desktop   |   | phone          |
+        | full grid |   | crop/pan/scale |
+        +-----------+   +----------------+</pre>
 
     <p>The running program sees one size and produces one stream of output. It cannot draw one version for the desktop client and another version for the mobile client at the same time.</p>
 
