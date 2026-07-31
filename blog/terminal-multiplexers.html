@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Why Are There So Many New Terminal Multiplexers? — Peter Pistorius</title>
+  <style>
+    body {
+      max-width: 480px;
+      line-height: 1.6;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <p><a href="/blog/">Blog</a></p>
+
+  <article>
+    <h1>Why are there so many new terminal multiplexers?</h1>
+
+    <p><time datetime="2026-07-30">July 30, 2026</time></p>
+
+    <p>There are a bunch of new terminal multiplexers coming out.</p>
+
+    <p>We already have tmux, screen, and Zellij. Now we have Herdr, cmux with its own take on the idea, zmx, and the new announcement from Mitchell Hashimoto and Superlogical.</p>
+
+    <p>I also want a new multiplexer for Machinen Desktop, and I want to explain why.</p>
+
+    <p>I think the real reason we are getting all these different multiplexers is that we are using our computers very differently than before.</p>
+
+    <h2>The problem</h2>
+
+    <p>Traditional multiplexers were designed around a person actively operating a terminal.</p>
+
+    <p>You open a terminal, start some programs, arrange them into windows and panes, and move between them. The multiplexer keeps those programs running if you disconnect, but the person operating the terminal remains at the center of the session.</p>
+
+    <p>That is no longer true when agents work independently for hours.</p>
+
+    <p>It is also no longer true when many agents and many people are working inside an organization. An agent may be working while nobody is watching. I may want to check it from another computer. A colleague may want to see what it is doing. Another agent may need to inspect its output or interact with it.</p>
+
+    <p>We also want to share compute.</p>
+
+    <p>The work might be running on my computer, your computer, a machine in the office, or a cloud computer. Where it runs still matters for performance, data, credentials, and security. It should not decide who can see the work or which interface they have to use.</p>
+
+    <p>The work should be able to stay on the computer where it is already running. Other people and agents should be able to connect to it there.</p>
+
+    <p>You want the session to remain available when you close the terminal, restart an application, lose an SSH connection, or move to another computer.</p>
+
+    <p>You want the output to exist separately from the terminal currently displaying it. It should be searchable and replayable instead of living only as scrollback in one terminal window.</p>
+
+    <p>You also want the session to be multiplayer. Several people and agents should be able to see and interact with the same work at the same time.</p>
+
+    <h2>Terminal applications are here to stay</h2>
+
+    <p>It is clear to me that terminal applications are here to stay because they are the most composable software we have.</p>
+
+    <p>A terminal application can run on my laptop, over SSH, inside a VM, or on a cloud computer. It can run inside a regular terminal emulator or behind a graphical application. Other software can start it, send it input, and read its output.</p>
+
+    <p>The application does not need to know whether I am looking at it through Kitty, Ghostty, a browser, Machinen Desktop, or something else that has not been built yet.</p>
+
+    <p>We do not need to replace terminal applications to support the way we are starting to work.</p>
+
+    <p>We need to separate the terminal session from the personal viewing experience.</p>
+
+    <h2>The server should own the session</h2>
+
+    <p>The server should own the PTY and keep the process running when clients disconnect.</p>
+
+    <p>The session should have an identity that does not depend on a particular window, application, process ID, or network connection. I should be able to find it again from another client or another computer.</p>
+
+    <p>The server should keep a durable record of the output and enough terminal state for a client to reconnect. That record should be available to software so it can be searched and replayed.</p>
+
+    <p>The server should also know which people and agents are connected. Several clients should be able to receive output and send input to the same session.</p>
+
+    <p>These are properties of the session:</p>
+
+    <ul>
+      <li>The PTY and process lifetime</li>
+      <li>A stable session identity</li>
+      <li>Terminal output and checkpoints</li>
+      <li>Connected participants</li>
+      <li>Input from those participants</li>
+      <li>Reconnection and recovery</li>
+      <li>A protocol that other software can use</li>
+    </ul>
+
+    <p>The personal view of the session does not need to be part of that state.</p>
+
+    <h2>The client should own the view</h2>
+
+    <p>The client should decide which sessions are visible and how they are arranged.</p>
+
+    <p>A desktop client may use spatial windows. Another client may use tabs. A browser may show a grid. A regular terminal may attach to one session directly. A phone may show status and recent output.</p>
+
+    <p>Each client should have its own focus, scroll position, selection, and viewport. One person reading earlier output should not move another person’s view.</p>
+
+    <p>Those clients should be able to use the same sessions without having to reproduce the same layout.</p>
+
+    <p>This is the problem I have with tmux. The tmux server owns windows, panes, focus, and layout. Every attached client has to understand and reproduce that view.</p>
+
+    <p>Herdr has the same issue. Its server owns workspaces, tabs, panes, and layout. It persists that layout and restores it when the server restarts. Herdr provides direct access to individual terminals and exposes a socket API, but its main model still makes the workspace layout part of shared server state.</p>
+
+    <p>I do not think a multiplexer that makes layout part of shared server state is future proof.</p>
+
+    <p>A multiplexer can ship with a client that provides tabs, splits, spatial windows, or any other arrangement. Those are useful client features. They should not become part of the session itself.</p>
+
+    <p>A phone should not have to reproduce a desktop layout. A browser should not have to reproduce the pane arrangement from somebody else’s terminal. An agent reading output through an API should not need to understand windows and tabs at all.</p>
+
+    <p>The server should expose sessions. Each client should compose those sessions into its own view.</p>
+
+    <h2>The terminal-size problem</h2>
+
+    <p>There is one part of the view that cannot be independent.</p>
+
+    <p>A program drawing into a terminal needs to understand the terminal’s rows and columns. A PTY has one authoritative size. If the program draws for 120 columns and 40 rows, its output is based on that size.</p>
+
+    <p>My preference would be for every client to view the same session at its own terminal size. A desktop could have a large terminal while a phone renders a smaller version of the same session.</p>
+
+    <p>A PTY cannot support that.</p>
+
+    <p>The running program sees one size and produces one stream of output. It cannot draw one version for the desktop client and another version for the mobile client at the same time.</p>
+
+    <p>Simple text output can sometimes be reflowed, but an arbitrary terminal application cannot. Full-screen applications use cursor movement, clearing, wrapping, and direct positioning. Reinterpreting that output at a different size can produce a different and incorrect terminal state.</p>
+
+    <p>The generic solution is one canonical terminal grid with a separate viewport for each client.</p>
+
+    <p>One option is for the session to use a fixed size. Every client would render that grid and adapt it to the space it has available. A desktop could scale or add space around it. A small window could crop or pan. A phone could zoom and maintain its own viewport.</p>
+
+    <p>That is a compromise. Scaling a wide terminal down to a phone can make the text unreadable. At some point the client has to pan instead of continuing to shrink it.</p>
+
+    <p>A regular terminal emulator is also a difficult client because it normally interprets output using its own rows and columns. It cannot display a different canonical grid correctly unless it matches the session size or uses another terminal renderer to crop and pan that grid.</p>
+
+    <p>The other solutions require support above the PTY.</p>
+
+    <p>Each client could run its own terminal process connected to shared application state. The application could also expose structured state and render separately for each client. Both approaches require cooperation from the application and cannot work for every existing terminal program.</p>
+
+    <p>So the server must own one terminal size for each PTY. The client can still own everything around that grid.</p>
+
+    <p>Terminal geometry and layout are different things.</p>
+
+    <p>Terminal geometry is the number of rows and columns inside one PTY. Layout is how several PTYs are arranged into tabs, panes, windows, or a spatial scene.</p>
+
+    <p>The server has to own the geometry. The client should own the layout.</p>
+
+    <h2>Multiplayer input</h2>
+
+    <p>A PTY also has one input stream, but that does not mean one person has to own it.</p>
+
+    <p>Several clients can send input. The server can order that input before writing it to the PTY. It can record which person or agent sent it even though the terminal application itself receives one stream of bytes.</p>
+
+    <p>Everyone is interacting with the same cursor and the same application state. If two people type at exactly the same time, their input has to be ordered. Independent cursors would require support from the terminal application.</p>
+
+    <p>The multiplexer should not assume that one client controls the session while everyone else is only watching. People and agents should be able to participate without passing an exclusive writer lease back and forth.</p>
+
+    <p>The terminal size remains shared even when input is multiplayer.</p>
+
+    <p>If the session uses a fixed canonical size, it may not need resize authority at all. If the size can change, that change has to apply to every client because the PTY can only have one size.</p>
+
+    <h2>The multiplexer should be composable</h2>
+
+    <p>Software makes sense when it is composable. It makes less sense when one program tries to provide everything for everyone.</p>
+
+    <p>A multiplexer does not need to become the terminal emulator, window manager, agent orchestrator, task tracker, source-control interface, and collaboration product.</p>
+
+    <p>Those may all be useful products. They do not all need to be part of the session layer.</p>
+
+    <p>We do not know what the best workflows for working with agents will look like. They will probably differ between people, teams, computers, and devices.</p>
+
+    <p>A session layer that prescribes the entire experience forces every client to use the same answer. A composable session layer lets different clients build different experiences on top of the same running work.</p>
+
+    <h2>The other multiplexers</h2>
+
+    <p>The newer multiplexers put the boundary between the session and the view in different places.</p>
+
+    <p><a href="https://zmx.sh">zmx</a> focuses on persistent sessions and multiple attachments. It explicitly does not provide windows, tabs, or splits. That is close to the separation I am describing.</p>
+
+    <p><a href="https://cmux.com">cmux</a> is a native terminal workspace with tabs, splits, notifications, and a browser. It describes itself as “a primitive, not a solution” and exposes a CLI and socket API.</p>
+
+    <p><a href="https://herdr.dev">Herdr</a> includes workspaces, tabs, panes, agent awareness, plugins, and a socket API. Its server owns both the terminal processes and their layout. It also allows direct attachment to individual terminals, but only one direct client can own input and resize while other clients observe.</p>
+
+    <p><a href="https://www.superlogical.com">Superlogical</a> is starting with a terminal multiplexer. Its stated next step is to make everything in it composable. The architecture Mitchell has described uses one PTY per stream and puts native splits in the client instead of drawing several panes into one server-owned terminal screen.</p>
+
+    <p>These projects are making different decisions because the way we use terminal sessions is changing. The part I care about is where the server stops and the client begins.</p>
+
+    <p>My answer is that the server should stop at the session.</p>
+
+    <h2>Why I want one for Machinen</h2>
+
+    <p>This is what I have been working through with Machinen.</p>
+
+    <p>Machinen Desktop should be one possible view of a terminal session. Its spatial layout belongs to Desktop. It should not be stored or controlled by the multiplexer.</p>
+
+    <p>Machinen Sessions owns individual PTYs independently of Desktop. Closing a terminal tile leaves its session running. The session remains on the local or SSH computer where the work is happening, and another client can attach to it.</p>
+
+    <p>The current implementation allows several clients to watch a session, but it gives one client the writer and resize leases. That is not the model I want to end up with.</p>
+
+    <p>The writer lease should become multiplayer input. Several people and agents should be able to send input to the same session.</p>
+
+    <p>The PTY size should be a property of the session rather than a property of one client. I would prefer every client to have its own terminal size, but that is not possible through a generic PTY. A canonical size with a separate viewport for each client is the practical option.</p>
+
+    <p>There is other work left as well. Machinen does not yet provide a fully durable, searchable transcript. It cannot resurrect a lost PTY after its host computer reboots. Its current checkpoints are for recovery rather than a complete replayable history.</p>
+
+    <p>Terminal applications should be able to keep running wherever the compute happens to be. My computer, your computer, or a cloud computer should all be able to host the work. People and agents should be able to connect to it from whichever interface makes sense for them.</p>
+
+    <p>The server should own the session. The client should own the view.</p>
+  </article>
+</body>
+</html>
